@@ -1,15 +1,15 @@
 import { createClient } from '@supabase/supabase-js';
 
 // Get Supabase configuration from environment variables
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL?.trim() || '';
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY?.trim() || '';
+const supabaseUrl = import.meta.env.NEXT_PUBLIC_SUPABASE_URL?.trim() || '';
+const supabaseAnonKey = import.meta.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim() || '';
 
 // Declare variables that will be exported
 let supabase: any;
 let testSupabaseConnection: () => Promise<boolean>;
 
 // Validate environment variables
-if (!supabaseUrl || !supabaseAnonKey || supabaseUrl === 'https://your-project-ref.supabase.co' || supabaseAnonKey === 'your-anon-key-here' || !supabaseUrl.startsWith('https://')) {
+if (!supabaseUrl || !supabaseAnonKey || supabaseUrl === 'https://qvjfjijwmsjrlfzmumdn.supabase.co' || supabaseAnonKey === 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF2amZqaWp3bXNqcmxmem11bWRuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA1OTIyNTIsImV4cCI6MjA2NjE2ODI1Mn0.9sGLKtqcGw-boRJOPGsmnJqZqKh20NuvQutBk9TRLks' || !supabaseUrl.startsWith('https://qvjfjijwmsjrlfzmumdn.supabase.co')) {
   console.warn('Supabase not configured properly. Using fallback mode.');
   console.warn('Please update your .env file with valid Supabase credentials.');
   
