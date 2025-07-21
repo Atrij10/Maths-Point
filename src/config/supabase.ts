@@ -1,15 +1,18 @@
 import { createClient } from '@supabase/supabase-js';
 
-// Get Supabase configuration from environment variables
-const supabaseUrl = import.meta.env.NEXT_PUBLIC_SUPABASE_URL?.trim() || '';
-const supabaseAnonKey = import.meta.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim() || '';
+// Get Supabase configuration from environment variables with fallbacks
+const supabaseUrl = (import.meta.env.VITE_SUPABASE_URL || 'https://qvjfjijwmsjrlfzmumdn.supabase.co').trim();
+const supabaseAnonKey = (import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF2amZqaWp3bXNqcmxmem11bWRuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA1OTIyNTIsImV4cCI6MjA2NjE2ODI1Mn0.9sGLKtqcGw-boRJOPGsmnJqZqKh20NuvQutBk9TRLks').trim();
 
 // Declare variables that will be exported
 let supabase: any;
 let testSupabaseConnection: () => Promise<boolean>;
 
-// Validate environment variables
-if (!supabaseUrl || !supabaseAnonKey || supabaseUrl === 'https://qvjfjijwmsjrlfzmumdn.supabase.co' || supabaseAnonKey === 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF2amZqaWp3bXNqcmxmem11bWRuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA1OTIyNTIsImV4cCI6MjA2NjE2ODI1Mn0.9sGLKtqcGw-boRJOPGsmnJqZqKh20NuvQutBk9TRLks' || !supabaseUrl.startsWith('https://qvjfjijwmsjrlfzmumdn.supabase.co')) {
+// Validate environment variables - check for placeholder values
+const isPlaceholderUrl = supabaseUrl === 'https://your-project-ref.supabase.co' || supabaseUrl === '';
+const isPlaceholderKey = supabaseAnonKey === 'your-anon-key-here' || supabaseAnonKey === '';
+
+if (isPlaceholderUrl || isPlaceholderKey || !supabaseUrl.startsWith('https://')) {
   console.warn('Supabase not configured properly. Using fallback mode.');
   console.warn('Please update your .env file with valid Supabase credentials.');
   
@@ -24,7 +27,7 @@ if (!supabaseUrl || !supabaseAnonKey || supabaseUrl === 'https://qvjfjijwmsjrlfz
   };
 } else {
   // Create Supabase client with enhanced error handling
-  supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  supabase = createClient(supabaseUrl.trim(), supabaseAnonKey.trim(), {
     auth: {
       autoRefreshToken: true,
       persistSession: true,
@@ -46,7 +49,7 @@ if (!supabaseUrl || !supabaseAnonKey || supabaseUrl === 'https://qvjfjijwmsjrlfz
   testSupabaseConnection = async (): Promise<boolean> => {
     try {
       // Simple connection test
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('announcements') 
         .select('id')
         .limit(1);
@@ -57,8 +60,12 @@ if (!supabaseUrl || !supabaseAnonKey || supabaseUrl === 'https://qvjfjijwmsjrlfz
       }
       
       return true;
-    } catch (error) {
-      console.error('Supabase connection test error:', error instanceof Error ? error.message : 'Unknown error');
+    } catch (error: any) {
+      if (error.message?.includes('fetch')) {
+        console.error('Network error - check internet connection and Supabase URL');
+      } else {
+        console.error('Supabase connection test error:', error instanceof Error ? error.message : 'Unknown error');
+      }
       return false;
     }
   };
